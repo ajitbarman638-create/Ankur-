@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ankur — Tasks &amp; Habits</title>
+<meta name="description" content="Ankur is a calm, local-first tracker for your daily tasks and habits. No accounts, no server — your data stays in your browser." />
+<meta name="theme-color" content="#f7f6f2" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 28V15' stroke='%231f7a4d' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M16 15C16 10 12.5 6.5 7.5 6.5c0 5 3.5 8.5 8.5 8.5Z' fill='%231f7a4d'/%3E%3Cpath d='M16 18c0-4.4 3.1-8 7.8-8 0 4.4-3.4 8-7.8 8Z' fill='%234fae7f'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none">
+          <path d="M16 29V14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M16 15C16 9.8 12.3 6 7 6c0 5.2 3.9 9 9 9Z" fill="currentColor"/>
+          <path d="M16 18.5c0-4.6 3.2-8.2 8-8.2 0 4.6-3.5 8.2-8 8.2Z" fill="currentColor" opacity=".55"/>
+        </svg>
+      </span>
+      <div class="brand-text">
+        <span class="brand-name">Ankur</span>
+        <span class="brand-date" id="today-label"></span>
+      </div>
+    </div>
+
+    <nav class="tabs" role="tablist" aria-label="Views">
+      <button class="tab" role="tab" data-view="tasks" id="tab-tasks" aria-controls="view-tasks" aria-selected="true">
+        Tasks <span class="tab-count" id="count-open" aria-hidden="true">0</span>
+      </button>
+      <button class="tab" role="tab" data-view="habits" id="tab-habits" aria-controls="view-habits" aria-selected="false">
+        Habits
+      </button>
+      <button class="tab" role="tab" data-view="stats" id="tab-stats" aria-controls="view-stats" aria-selected="false">
+        Stats
+      </button>
+    </nav>
+
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Change theme" title="Change theme">
+      <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M4.5 12H2.3M21.7 12h-2.2M6.7 6.7 5.1 5.1M18.9 18.9l-1.6-1.6M17.3 6.7l1.6-1.6M5.1 18.9l1.6-1.6"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.2 8.2 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+      <svg class="i-auto" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17" /><path d="M12 3.5a8.5 8.5 0 0 1 0 17Z" fill="currentColor" stroke="none"/></svg>
+    </button>
+  </header>
+
+  <main>
+    <!-- ================= TASKS ================= -->
+    <section class="view" id="view-tasks" role="tabpanel" aria-labelledby="tab-tasks">
+      <div class="view-head">
+        <h1>What needs doing?</h1>
+        <p class="muted" id="task-summary">Nothing on the list yet.</p>
+      </div>
+
+      <form class="composer card" id="task-form" autocomplete="off">
+        <div class="composer-main">
+          <input id="task-title" name="title" type="text" maxlength="140" placeholder="Add a task…  (press N)" aria-label="Task title" required />
+          <button class="btn primary" type="submit">Add</button>
+        </div>
+        <div class="composer-meta">
+          <label class="field">
+            <span>Due</span>
+            <input id="task-due" type="date" />
+          </label>
+          <label class="field">
+            <span>Priority</span>
+            <select id="task-priority">
+              <option value="normal">Normal</option>
+              <option value="high">High</option>
+              <option value="low">Low</option>
+            </select>
+          </label>
+          <label class="field grow">
+            <span>Note <em>(optional)</em></span>
+            <input id="task-note" type="text" maxlength="200" placeholder="A detail worth remembering" />
+          </label>
+        </div>
+      </form>
+
+      <div class="toolbar">
+        <div class="segmented" role="group" aria-label="Filter tasks">
+          <button type="button" data-filter="all" class="active">All</button>
+          <button type="button" data-filter="active">Active</button>
+          <button type="button" data-filter="done">Done</button>
+        </div>
+        <div class="toolbar-right">
+          <label class="search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+            <input id="task-search" type="search" placeholder="Search  ( / )" aria-label="Search tasks" />
+          </label>
+          <select id="task-sort" class="sort" aria-label="Sort tasks">
+            <option value="created">Newest</option>
+            <option value="due">Due date</option>
+            <option value="priority">Priority</option>
+            <option value="title">A–Z</option>
+          </select>
+        </div>
+      </div>
+
+      <ul class="task-list" id="task-list"></ul>
+
+      <div class="empty" id="task-empty" hidden>
+        <p class="empty-title" id="empty-title">A clear list. A clear mind.</p>
+        <p class="muted" id="empty-text">Add your first task above — or take a tour with some sample data.</p>
+        <button class="btn ghost" type="button" id="load-demo">Load sample data</button>
+      </div>
+    </section>
+
+    <!-- ================= HABITS ================= -->
+    <section class="view" id="view-habits" role="tabpanel" aria-labelledby="tab-habits" hidden>
+      <div class="view-head">
+        <h1>Small things, every day.</h1>
+        <p class="muted">Tap a day to check it off. Streaks count back from today (or yesterday).</p>
+      </div>
+
+      <form class="composer card compact" id="habit-form" autocomplete="off">
+        <div class="composer-main">
+          <input id="habit-name" type="text" maxlength="60" placeholder="New habit — e.g. Read 10 pages" aria-label="Habit name" required />
+          <button class="btn primary" type="submit">Add habit</button>
+        </div>
+      </form>
+
+      <div class="habit-list" id="habit-list"></div>
+
+      <div class="empty" id="habit-empty" hidden>
+        <p class="empty-title">Habits grow quietly.</p>
+        <p class="muted">Add one above. Two weeks of dots is worth more than a perfect plan.</p>
+      </div>
+    </section>
+
+    <!-- ================= STATS ================= -->
+    <section class="view" id="view-stats" role="tabpanel" aria-labelledby="tab-stats" hidden>
+      <div class="view-head">
+        <h1>The long view.</h1>
+        <p class="muted">Everything here is computed from your own data.</p>
+      </div>
+      <div id="stats-body"></div>
+      <div class="danger-zone">
+        <div>
+          <h3>Start over</h3>
+          <p class="muted small">Deletes every task and habit stored in this browser. Cannot be undone.</p>
+        </div>
+        <button class="btn danger" type="button" id="reset-all">Clear all data</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>Local-first — your data never leaves this browser.</span>
+    <span class="kbd-hint"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> switch views</span>
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden>
+  <span id="toast-msg"></span>
+  <button type="button" id="toast-action" hidden>Undo</button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
